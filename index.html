@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Latido - Rubria Rocha de Luna</title>
+    <style>
+        /* Estilos Generales y Fondo */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Georgia', serif; 
+            background-image: url('familia1.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #2c2c2c;
+            user-select: none; /* Evita que el texto se seleccione accidentalmente al hacer clic */
+        }
+
+        /* Capa semitransparente para legibilidad */
+        .overlay {
+            background-color: rgba(255, 255, 255, 0.82); 
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 50px 20px 150px 20px; 
+            box-sizing: border-box;
+            cursor: pointer; /* Indica al usuario que puede hacer clic en toda el área */
+        }
+
+        h1 {
+            font-size: 3.5em;
+            margin-bottom: 30px;
+            font-weight: normal;
+            letter-spacing: 3px;
+            color: #1a1a1a;
+            text-align: center;
+        }
+
+        .poem-container {
+            max-width: 750px;
+            width: 100%;
+            text-align: center; /* Centra el texto del poema por completo */
+        }
+
+        .estrofa {
+            margin-bottom: 35px; /* Espacio entre estrofas */
+        }
+
+        .linea {
+            line-height: 2;
+            opacity: 0; /* Ocultas por defecto */
+            transform-origin: center; 
+            display: block; 
+            font-size: 1.2em;
+            /* La animación ahora es infinita y corre constantemente para mantener la sincronía */
+            animation: latido-efecto 1.2s infinite ease-out;
+            /* La transición solo afecta la aparición (fade-in) */
+            transition: opacity 0.5s ease;
+        }
+
+        /* Clase que hace visible la línea */
+        .linea.visible {
+            opacity: 1;
+        }
+
+        /* Animación del latido (lub-dub) continua */
+        @keyframes latido-efecto {
+            0%   { transform: scale(1); text-shadow: 0 0 0 rgba(0,0,0,0); }
+            15%  { transform: scale(1.03); text-shadow: 0 0 10px rgba(0,0,0,0.15); color: #050505; }
+            30%  { transform: scale(1); text-shadow: 0 0 0 rgba(0,0,0,0); }
+            45%  { transform: scale(1.02); text-shadow: 0 0 8px rgba(0,0,0,0.15); color: #050505; }
+            100% { transform: scale(1); text-shadow: 0 0 0 rgba(0,0,0,0); }
+        }
+
+        /* Footer */
+        footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: rgba(20, 20, 20, 0.9);
+            color: #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 40px;
+            box-sizing: border-box;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-weight: 300;
+            cursor: default;
+        }
+
+        .copyright {
+            font-size: 0.9em;
+            letter-spacing: 1px;
+        }
+
+        #btn-detras {
+            background: transparent;
+            border: 1px solid #e0e0e0;
+            color: #e0e0e0;
+            padding: 8px 18px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        #btn-detras:hover {
+            background-color: #e0e0e0;
+            color: #141414;
+        }
+
+        /* Modal para "Detrás de la pantalla" */
+        #modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(15, 15, 15, 0.95);
+            color: #f5f5f5;
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 60px 20px;
+            box-sizing: border-box;
+            cursor: default;
+        }
+
+        .modal-content {
+            max-width: 750px;
+            margin: 0 auto;
+            line-height: 1.7;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 1.05em;
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+            font-family: 'Georgia', serif;
+            font-size: 2em;
+            font-weight: normal;
+            border-bottom: 1px solid #444;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .modal-content p {
+            margin-bottom: 20px;
+            text-align: justify;
+        }
+
+        .firma {
+            margin-top: 40px;
+            text-align: right;
+        }
+
+        .close-btn {
+            background: #f5f5f5;
+            color: #0f0f0f;
+            border: none;
+            padding: 12px 25px;
+            cursor: pointer;
+            margin-top: 40px;
+            font-size: 1em;
+            transition: opacity 0.3s;
+        }
+
+        .close-btn:hover {
+            opacity: 0.8;
+        }
+
+        /* Pantalla de inicio para instrucciones y activar el audio */
+        #start-overlay {
+            position: fixed;
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%;
+            background-color: #050505;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            flex-direction: column;
+            font-family: 'Georgia', serif;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        #start-overlay p {
+            font-size: 1.3em;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+            color: #e0e0e0;
+            line-height: 1.5;
+        }
+        
+        #start-overlay .instruccion-secundaria {
+            font-size: 1em;
+            color: #888;
+            margin-bottom: 40px;
+            font-family: 'Helvetica Neue', sans-serif;
+            font-weight: 300;
+        }
+
+        #start-overlay button {
+            padding: 12px 30px;
+            font-size: 1.1em;
+            cursor: pointer;
+            background: transparent;
+            color: white;
+            border: 1px solid white;
+            font-family: 'Helvetica Neue', sans-serif;
+            transition: all 0.3s;
+        }
+
+        #start-overlay button:hover {
+            background: white;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+
+<div id="start-overlay">
+    <p>Para avanzar en la lectura, haz clic en la pantalla.</p>
+    <p class="instruccion-secundaria">Cada clic revelará un nuevo verso al ritmo de un latido.</p>
+    <button onclick="iniciarObra(event)">Ingresar a Latido</button>
+</div>
+
+<audio id="audio-latidos" loop>
+    <source src="latidos.wav" type="audio/wav">
+    Tu navegador no soporta el elemento de audio.
+</audio>
+
+<div class="overlay" id="area-poema">
+    <h1>Latido</h1>
+    
+    <div class="poem-container">
+        <div class="estrofa">
+            <span class="linea">Llevar tu ausencia es descubrir, de algún modo,</span>
+            <span class="linea">que en realidad nunca te has ido del todo.</span>
+            <span class="linea">Te busco en los archivos de la memoria lejana,</span>
+            <span class="linea">pero te encuentro, viva, en mi espejo a cada mañana:</span>
+        </div>
+        
+        <div class="estrofa">
+            <span class="linea">Estás en mi empeño por cruzar fronteras,</span>
+            <span class="linea">por prepararme y avanzar de distintas maneras.</span>
+            <span class="linea">En la valentía con que sostengo mi propia casa,</span>
+            <span class="linea">en el orden minucioso que mi mundo abraza,</span>
+            <span class="linea">y en ese amor tan grande y constante,</span>
+            <span class="linea">que le tengo al pueblo de Bustamante.</span>
+        </div>
+        
+        <div class="estrofa">
+            <span class="linea">Desde que soy madre entiendo el amor que me dabas,</span>
+            <span class="linea">el idioma profundo con el que me cuidabas.</span>
+            <span class="linea">Ahora tu nieta te conoce, te nombra y te habita,</span>
+            <span class="linea">con una presencia que es pura e infinita,</span>
+            <span class="linea">y aunque el tiempo no les permitió coincidir en la tierra,</span>
+            <span class="linea">el lazo que las une mi corazón lo encierra.</span>
+        </div>
+        
+        <div class="estrofa">
+            <span class="linea">Has venido a mis sueños, con total calma y alegría,</span>
+            <span class="linea">sana y sonriente, como en tu mejor día.</span>
+            <span class="linea">Diciéndome al oído, para que en paz duerma,</span>
+            <span class="linea">que en la eternidad nunca has estado enferma.</span>
+        </div>
+        
+        <div class="estrofa">
+            <span class="linea">He guardado tus objetos como tú me lo pediste,</span>
+            <span class="linea">honrando con gran celo lo mucho que me diste,</span>
+            <span class="linea">pero sé que desde tu luz entiendes el contexto,</span>
+            <span class="linea">y que los platos y figuras eran solo el pretexto;</span>
+            <span class="linea">de lo que de verdad importaba, y que no se desgasta,</span>
+            <span class="linea">de ese tejido inmaterial que dejaste y que me basta.</span>
+        </div>
+        
+        <div class="estrofa">
+            <span class="linea">No dejaré que el futuro sea gris o sombrío,</span>
+            <span class="linea">tú me enseñaste a encenderlo y a quitarle el frío.</span>
+            <span class="linea">Gracias por todo mami, por tu memoria;</span>
+            <span class="linea">Que mientras yo respire, no se borrará tu historia.</span>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <div class="copyright">&copy; Rubria Rocha de luna, 2026</div>
+    <button id="btn-detras" onclick="abrirModal(event)">Detrás de la pantalla</button>
+</footer>
+
+<div id="modal">
+    <div class="modal-content">
+        <h2>Detrás de la pantalla: La serie Memoria</h2>
+        <p>El proceso de migración y retorno suele estar marcado por una herida profunda, pero cuando a esa fractura se le suma el duelo por la pérdida de la memoria y de la vida misma, el sentimiento adquiere una magnitud que parece desbordar cualquier lenguaje. La creación de la serie <em>Memoria</em> ha sido, en esencia, un ejercicio de inmersión en ese abismo: días enteros de pensar, escribir y, sobre todo, llorar frente a la imposibilidad de recuperar lo que se desvanece.</p>
+        
+        <p>Resulta paradójico que, mientras la carga temática de las obras es tan pesada, la intervención técnica dentro de la creación digital se revele, por el contrario, como un espacio de juego y curiosidad. Programar se convirtió en un proceso de experimentación constante: probar, revisar, repetir, romper y modificar, una y otra vez, hasta que la pieza logra, finalmente, articular esa verdad que uno intenta expresar. Quizás nunca me habría atrevido a explorar estos temas por cuenta propia —siempre hay una excusa a mano para evitar mirar de frente aquello que duele—, pero agradezco profundamente el reto impulsado por Iván Vergara García, profesor de Literatura Digital en la Universidad de Salamanca. A través del curso <em>La máquina creadora</em>, él nos empujó a mis compañeros y a mí a llevar estos ejercicios de escritura más allá de la página, encontrando en la literatura electrónica un cauce para lo inefable.</p>
+        
+        <p>En este trayecto, la colaboración con la inteligencia artificial se integró de manera orgánica en mi metodología de trabajo. Me siento especialmente satisfecha con la sinergia lograda: Gemini se convirtió en un aliado fundamental en la creación de video y en el soporte técnico del <em>vibe coding</em>, mientras que la edición y creación de imágenes fluyó principalmente a través del apoyo de ChatGPT. La serie <em>Memoria</em> es el resultado de la conjugación de todos estos aprendizajes, un producto final donde la tecnología no solo soporta el relato, sino que se vuelve, ella misma, un dispositivo de memoria.</p>
+        
+        <div class="firma">
+            <strong>Rubria Rocha de Luna</strong><br>
+            23 de junio del 2026.
+        </div>
+        
+        <button class="close-btn" onclick="cerrarModal(event)">Volver a la obra</button>
+    </div>
+</div>
+
+<script>
+    const lineas = document.querySelectorAll('.linea');
+    let lineaActual = 0;
+
+    function iniciarObra(event) {
+        event.stopPropagation(); 
+
+        var overlay = document.getElementById('start-overlay');
+        overlay.style.transition = "opacity 1s ease";
+        overlay.style.opacity = "0";
+        setTimeout(function() {
+            overlay.style.display = 'none';
+        }, 1000);
+
+        var audio = document.getElementById('audio-latidos');
+        audio.play().catch(function(error) {
+            console.log("El navegador requirió más interacción para el audio.");
+        });
+    }
+
+    document.getElementById('area-poema').addEventListener('click', function() {
+        if (lineaActual < lineas.length) {
+            // Ya no removemos la animación de las líneas anteriores, 
+            // simplemente hacemos visible la nueva línea.
+            let linea = lineas[lineaActual];
+            linea.classList.add('visible');
+            
+            lineaActual++;
+            
+            // Suave desplazamiento hacia abajo conforme crece el texto
+            window.scrollBy({ top: 40, behavior: 'smooth' });
+        }
+    });
+
+    function abrirModal(event) {
+        event.stopPropagation(); 
+        var modal = document.getElementById('modal');
+        modal.style.display = 'block';
+    }
+
+    function cerrarModal(event) {
+        event.stopPropagation();
+        var modal = document.getElementById('modal');
+        modal.style.display = 'none';
+    }
+</script>
+
+</body>
+</html>
